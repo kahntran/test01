@@ -28,7 +28,7 @@ jobs:
 
     - name: Deploy to EC2
       run: |
-        rsync -avz --delete --exclude-from=".rsyncignore" -e "ssh -i ~/.ssh/id_rsa" ./ ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/tmp/test01
+        rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa" ./ ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/tmp/test01
         ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_PUBLIC_IP }} "cd /tmp/test01 && docker run --rm -v /tmp/test01:/app composer install --no-interaction --prefer-dist --optimize-autoloader && docker exec $(docker ps -f \'name=laravel.test*\' --format \{\{' .Names '\}\}) php artisan migrate --force && docker exec $(docker ps -f \'name=laravel.test*\' --format \{\{' .Names '\}\}) php artisan config:cache && docker exec $(docker ps -f \'name=laravel.test*\' --format \{\{' .Names '\}\}) php artisan route:cache"
 
     - name: Clear SSH key
